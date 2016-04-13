@@ -381,7 +381,6 @@ int main(void)
 		UpdateSwitches();
 		UpdatePackets();
 		UpdateTemp();
-		UpdateIGrid();		//OJO que LCD lleva algo de tiempo y quita determinacion
 
 	}	//termina while(1)
 
@@ -406,25 +405,6 @@ void Update_PWM (unsigned short pwm)
 {
 	Update_TIM3_CH1 (pwm);
 	Update_TIM3_CH2 (4095 - pwm);
-}
-
-
-unsigned short Get_Temp (void)
-{
-	unsigned short total_ma;
-	unsigned char j;
-
-	//Kernel mejorado ver 2
-	//si el vector es de 0 a 7 (+1) sumo todas las posiciones entre 1 y 8, acomodo el nuevo vector entre 0 y 7
-	total_ma = 0;
-	vtemp[LARGO_FILTRO] = ReadADC1 (CH_IN_TEMP);
-    for (j = 0; j < (LARGO_FILTRO); j++)
-    {
-    	total_ma += vtemp[j + 1];
-    	vtemp[j] = vtemp[j + 1];
-    }
-
-    return total_ma >> DIVISOR;
 }
 
 unsigned char MAFilter (unsigned char new_sample, unsigned char * vsample)

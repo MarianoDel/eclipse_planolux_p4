@@ -227,9 +227,6 @@ void UpdateSwitches (void);
 unsigned char CheckS1 (void);
 unsigned char CheckS2 (void);
 
-void UpdateIGrid (void);
-unsigned short GetIGrid (void);
-unsigned char CheckIGrid (void);
 unsigned short MAFilterFast (unsigned short, unsigned short *);
 
 #endif /* HARD_H_ */

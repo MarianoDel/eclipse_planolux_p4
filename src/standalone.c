@@ -1264,7 +1264,8 @@ void MenuStandAloneCert(void)
 			if (!scroll1_timer)
 			{
 				scroll1_timer = 500;
-				local_meas = GetIGrid();
+				//local_meas = GetIGrid();
+				/*
 				if (standalone_last_current != local_meas)
 				{
 					standalone_last_current = local_meas;
@@ -1281,6 +1282,7 @@ void MenuStandAloneCert(void)
 					Lcd_SetDDRAM(0x40 + 10);
 					LCDTransmitStr(s_lcd);
 				}
+				*/
 			}
 
 			break;

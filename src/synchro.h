@@ -61,13 +61,11 @@ unsigned char CheckFGrid (void);
 unsigned char CheckFGridFast (unsigned short);
 unsigned char CheckGridNoise (void);
 unsigned char CheckVin (void);
-unsigned short GetIGrid (void);
 
 void UpdateVGrid (void);
 void UpdateFGrid (void);
 void UpdateSyncNoise (void);
 void UpdateVin (unsigned short);
-void UpdateIGrid (void);
 
 
 #endif /* SYNCHRO_H_ */
