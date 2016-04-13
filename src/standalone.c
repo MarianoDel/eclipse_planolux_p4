@@ -96,16 +96,16 @@ unsigned char FuncStandAlone (void)
 			break;
 
 		case STAND_ALONE_OFF:
-			if (CheckACSw() > S_NO)	//estan prendiendo o queriendo dimerizar
-			{
+//			if (CheckACSw() > S_NO)	//estan prendiendo o queriendo dimerizar
+//			{
 				standalone_timer = 1500;
 				standalone_state = STAND_ALONE_OFF_1;
-			}
+//			}
 			break;
 
 		case STAND_ALONE_OFF_1:
-			if (CheckACSw() == S_NO)	//liberaron el sw
-			{
+//			if (CheckACSw() == S_NO)	//liberaron el sw
+//			{
 				RELAY_ON;
 				if (standalone_selections == MENU_OFF)
 				{
@@ -125,7 +125,7 @@ unsigned char FuncStandAlone (void)
 					standalone_timer = TT_STARTING;	//tarda 940 msegs en arrancar la fuente
 					standalone_state = STAND_ALONE_OFF_2;
 				}
-			}
+//			}
 			break;
 
 		case STAND_ALONE_OFF_2:
@@ -181,16 +181,16 @@ unsigned char FuncStandAlone (void)
 			break;
 
 		case STAND_ALONE_ON:
-			if (CheckACSw() > S_NO)	//estan apagando o queriendo dimerizar
-			{
+//			if (CheckACSw() > S_NO)	//estan apagando o queriendo dimerizar
+//			{
 				standalone_timer = 1500;
 				standalone_state = STAND_ALONE_ON_1;
-			}
+//			}
 			break;
 
 		case STAND_ALONE_ON_1:
-			if (CheckACSw() == S_NO)	//liberaron el sw
-			{
+//			if (CheckACSw() == S_NO)	//liberaron el sw
+//			{
 				if (standalone_timer)	//apagaron
 				{
 					standalone_dimming_last_value = standalone_ii;
@@ -207,7 +207,7 @@ unsigned char FuncStandAlone (void)
 					standalone_state = STAND_ALONE_FALLING;
 					standalone_timer = TT_RISING_FALLING;		//TODO guarda que me bloque el if de abajo
 				}
-			}
+//			}
 
 			if (!standalone_timer)		//estan dimerizando!!!
 				standalone_state = STAND_ALONE_DIMMING_LAST;
@@ -257,20 +257,20 @@ unsigned char FuncStandAlone (void)
 				else
 					standalone_timer = TT_RISING_FALLING;
 
-				if (CheckACSw() > S_NO)
-				{
+//				if (CheckACSw() > S_NO)
+//				{
 					if (standalone_ii < StandAloneStruct_local.max_dimmer_value_dmx)
 					{
 						standalone_ii++;
 						Update_TIM3_CH1 (standalone_ii);
 					}
-				}
-				else	//si liberaron y estoy en maximo lo doy vuelta
-				{
+//				}
+//				else	//si liberaron y estoy en maximo lo doy vuelta
+//				{
 					if (standalone_ii >= StandAloneStruct_local.max_dimmer_value_dmx)
 						standalone_dimming_last_slope = DIM_DOWN;
 					standalone_state = STAND_ALONE_ON;
-				}
+//				}
 			}
 			break;
 
@@ -282,20 +282,20 @@ unsigned char FuncStandAlone (void)
 				else
 					standalone_timer = TT_RISING_FALLING;
 
-				if (CheckACSw() > S_NO)
-				{
+//				if (CheckACSw() > S_NO)
+//				{
 					if (standalone_ii > StandAloneStruct_local.min_dimmer_value_dmx)
 					{
 						standalone_ii--;
 						Update_TIM3_CH1 (standalone_ii);
 					}
-				}
-				else	//si liberaron y estoy en minimo lo doy vuelta
-				{
+//				}
+//				else	//si liberaron y estoy en minimo lo doy vuelta
+//				{
 					if (standalone_ii <= StandAloneStruct_local.min_dimmer_value_dmx)
 						standalone_dimming_last_slope = DIM_UP;
 					standalone_state = STAND_ALONE_ON;
-				}
+//				}
 			}
 			break;
 
@@ -934,16 +934,16 @@ unsigned char FuncStandAloneCert (void)
 			break;
 
 		case STAND_ALONE_OFF:
-			if (CheckACSw() > S_NO)	//estan prendiendo o queriendo dimerizar
-			{
+//			if (CheckACSw() > S_NO)	//estan prendiendo o queriendo dimerizar
+//			{
 				standalone_timer = 1500;
 				standalone_state = STAND_ALONE_OFF_1;
-			}
+//			}
 			break;
 
 		case STAND_ALONE_OFF_1:
-			if (CheckACSw() == S_NO)	//liberaron el sw
-			{
+//			if (CheckACSw() == S_NO)	//liberaron el sw
+//			{
 				RELAY_ON;
 				if (standalone_selections == MENU_OFF)
 				{
@@ -963,7 +963,7 @@ unsigned char FuncStandAloneCert (void)
 					standalone_timer = TT_STARTING;	//tarda 940 msegs en arrancar la fuente
 					standalone_state = STAND_ALONE_OFF_2;
 				}
-			}
+//			}
 			break;
 
 		case STAND_ALONE_OFF_2:
@@ -1019,16 +1019,16 @@ unsigned char FuncStandAloneCert (void)
 			break;
 
 		case STAND_ALONE_ON:
-			if (CheckACSw() > S_NO)	//estan apagando o queriendo dimerizar
-			{
+//			if (CheckACSw() > S_NO)	//estan apagando o queriendo dimerizar
+//			{
 				standalone_timer = 1500;
 				standalone_state = STAND_ALONE_ON_1;
-			}
+//			}
 			break;
 
 		case STAND_ALONE_ON_1:
-			if (CheckACSw() == S_NO)	//liberaron el sw
-			{
+//			if (CheckACSw() == S_NO)	//liberaron el sw
+//			{
 				if (standalone_timer)	//apagaron
 				{
 					standalone_dimming_last_value = standalone_ii;
@@ -1045,7 +1045,7 @@ unsigned char FuncStandAloneCert (void)
 					standalone_state = STAND_ALONE_FALLING;
 					standalone_timer = TT_RISING_FALLING;		//TODO guarda que me bloque el if de abajo
 				}
-			}
+//			}
 
 			if (!standalone_timer)		//estan dimerizando!!!
 				standalone_state = STAND_ALONE_DIMMING_LAST;
@@ -1095,20 +1095,20 @@ unsigned char FuncStandAloneCert (void)
 				else
 					standalone_timer = TT_RISING_FALLING;
 
-				if (CheckACSw() > S_NO)
-				{
+//				if (CheckACSw() > S_NO)
+//				{
 					if (standalone_ii < StandAloneStruct_local.max_dimmer_value_dmx)
 					{
 						standalone_ii++;
 						Update_TIM3_CH1 (standalone_ii);
 					}
-				}
-				else	//si liberaron y estoy en maximo lo doy vuelta
-				{
+//				}
+//				else	//si liberaron y estoy en maximo lo doy vuelta
+//				{
 					if (standalone_ii >= StandAloneStruct_local.max_dimmer_value_dmx)
 						standalone_dimming_last_slope = DIM_DOWN;
 					standalone_state = STAND_ALONE_ON;
-				}
+//				}
 			}
 			break;
 
@@ -1120,20 +1120,20 @@ unsigned char FuncStandAloneCert (void)
 				else
 					standalone_timer = TT_RISING_FALLING;
 
-				if (CheckACSw() > S_NO)
-				{
+//				if (CheckACSw() > S_NO)
+//				{
 					if (standalone_ii > StandAloneStruct_local.min_dimmer_value_dmx)
 					{
 						standalone_ii--;
 						Update_TIM3_CH1 (standalone_ii);
 					}
-				}
-				else	//si liberaron y estoy en minimo lo doy vuelta
-				{
+//				}
+//				else	//si liberaron y estoy en minimo lo doy vuelta
+//				{
 					if (standalone_ii <= StandAloneStruct_local.min_dimmer_value_dmx)
 						standalone_dimming_last_slope = DIM_UP;
 					standalone_state = STAND_ALONE_ON;
-				}
+//				}
 			}
 			break;
 

@@ -10,8 +10,8 @@
 
 
 //-------- Defines For Configuration -------------
-//#define VER_1_0
-#define VER_1_2
+#define VER_1_0
+//#define VER_1_2
 
 
 //-------- End Of Defines For Configuration ------
@@ -198,16 +198,10 @@
 #define SHOW_NUMBERS	1
 
 #define SWITCHES_TIMER_RELOAD	10
-#define AC_SWITCH_TIMER_RELOAD	22
 
 #define SWITCHES_THRESHOLD_FULL	300		//3 segundos
 #define SWITCHES_THRESHOLD_HALF	100		//1 segundo
 #define SWITCHES_THRESHOLD_MIN	5		//50 ms
-
-#define AC_SWITCH_THRESHOLD_ROOF	255		//techo del integrador
-#define AC_SWITCH_THRESHOLD_FULL	136		//3 segundos
-#define AC_SWITCH_THRESHOLD_HALF	45		//1 segundo
-#define AC_SWITCH_THRESHOLD_MIN		2		//50 ms
 
 #define TTIMER_FOR_CAT_DISPLAY			2000	//tiempo entre que dice canal y el numero
 #define TIMER_STANDBY_TIMEOUT_REDUCED	2000	//reduced 2 segs
@@ -232,8 +226,6 @@
 void UpdateSwitches (void);
 unsigned char CheckS1 (void);
 unsigned char CheckS2 (void);
-void UpdateACSwitch (void);
-unsigned char CheckACSw (void);
 
 void UpdateIGrid (void);
 unsigned short GetIGrid (void);

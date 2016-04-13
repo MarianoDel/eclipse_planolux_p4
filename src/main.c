@@ -102,7 +102,6 @@ volatile unsigned char data[256];
 //volatile unsigned short mainmenu_timer = 0;
 volatile unsigned short show_select_timer = 0;
 volatile unsigned char switches_timer = 0;
-volatile unsigned char acswitch_timer = 0;
 
 volatile unsigned short scroll1_timer = 0;
 volatile unsigned short scroll2_timer = 0;
@@ -167,8 +166,6 @@ const char s_blank_line [] = {"                "};
 // ------- Externals de los switches -------
 unsigned short s1;
 unsigned short s2;
-unsigned short sac;
-unsigned char sac_aux;
 
 
 //--- VARIABLES GLOBALES ---//
@@ -382,7 +379,6 @@ int main(void)
 
 
 		UpdateSwitches();
-		UpdateACSwitch();
 		UpdatePackets();
 		UpdateTemp();
 		UpdateIGrid();		//OJO que LCD lleva algo de tiempo y quita determinacion
@@ -570,9 +566,6 @@ void TimingDelay_Decrement(void)
 
 	if (switches_timer)
 		switches_timer--;
-
-	if (acswitch_timer)
-		acswitch_timer--;
 
 	if (dmx_timeout_timer)
 		dmx_timeout_timer--;

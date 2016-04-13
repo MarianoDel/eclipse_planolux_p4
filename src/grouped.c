@@ -96,16 +96,16 @@ unsigned char FuncGrouped (void)
 			break;
 
 		case GROUPED_OFF:
-			if (CheckACSw() > S_NO)	//estan prendiendo o queriendo dimerizar
-			{
+//			if (CheckACSw() > S_NO)	//estan prendiendo o queriendo dimerizar
+//			{
 				grouped_timer = 1500;
 				grouped_state = GROUPED_OFF_1;
-			}
+//			}
 			break;
 
 		case GROUPED_OFF_1:
-			if (CheckACSw() == S_NO)	//liberaron el sw
-			{
+//			if (CheckACSw() == S_NO)	//liberaron el sw
+//			{
 				RELAY_ON;
 				if (grouped_selections == MENU_OFF)
 				{
@@ -128,7 +128,7 @@ unsigned char FuncGrouped (void)
 					grouped_timer = TT_STARTING;	//tarda 940 msegs en arrancar la fuente
 					grouped_state = GROUPED_OFF_2;
 				}
-			}
+//			}
 			break;
 
 		case GROUPED_OFF_2:
@@ -190,16 +190,16 @@ unsigned char FuncGrouped (void)
 			break;
 
 		case GROUPED_ON:
-			if (CheckACSw() > S_NO)	//estan apagando o queriendo dimerizar
-			{
+//			if (CheckACSw() > S_NO)	//estan apagando o queriendo dimerizar
+//			{
 				grouped_timer = 1500;
 				grouped_state = GROUPED_ON_1;
-			}
+//			}
 			break;
 
 		case GROUPED_ON_1:
-			if (CheckACSw() == S_NO)	//liberaron el sw
-			{
+//			if (CheckACSw() == S_NO)	//liberaron el sw
+//			{
 				if (grouped_timer)	//apagaron
 				{
 					grouped_dimming_last_value = grouped_ii;
@@ -218,7 +218,7 @@ unsigned char FuncGrouped (void)
 					grouped_state = GROUPED_FALLING;
 					grouped_timer = TT_RISING_FALLING;		//TODO guarda que me bloque el if de abajo
 				}
-			}
+//			}
 
 			if (!grouped_timer)		//estan dimerizando!!!
 				grouped_state = GROUPED_DIMMING_LAST;
@@ -274,8 +274,8 @@ unsigned char FuncGrouped (void)
 				else
 					grouped_timer = TT_RISING_FALLING;
 
-				if (CheckACSw() > S_NO)
-				{
+//				if (CheckACSw() > S_NO)
+//				{
 					if (grouped_ii < GroupedStruct_local.max_dimmer_value_dmx)
 					{
 						grouped_ii++;
@@ -284,13 +284,13 @@ unsigned char FuncGrouped (void)
 						grouped_master_timeout_timer = TT_MASTER_TIMEOUT;
 						Update_TIM3_CH1 (grouped_ii);
 					}
-				}
-				else	//si liberaron y estoy en maximo lo doy vuelta
-				{
+//				}
+//				else	//si liberaron y estoy en maximo lo doy vuelta
+//				{
 					if (grouped_ii >= GroupedStruct_local.max_dimmer_value_dmx)
 						grouped_dimming_last_slope = DIM_DOWN;
 					grouped_state = GROUPED_ON;
-				}
+//				}
 			}
 			break;
 
@@ -302,8 +302,8 @@ unsigned char FuncGrouped (void)
 				else
 					grouped_timer = TT_RISING_FALLING;
 
-				if (CheckACSw() > S_NO)
-				{
+//				if (CheckACSw() > S_NO)
+//				{
 					if (grouped_ii > GroupedStruct_local.min_dimmer_value_dmx)
 					{
 						grouped_ii--;
@@ -312,13 +312,13 @@ unsigned char FuncGrouped (void)
 						grouped_master_timeout_timer = TT_MASTER_TIMEOUT;
 						Update_TIM3_CH1 (grouped_ii);
 					}
-				}
-				else	//si liberaron y estoy en minimo lo doy vuelta
-				{
+//				}
+//				else	//si liberaron y estoy en minimo lo doy vuelta
+//				{
 					if (grouped_ii <= GroupedStruct_local.min_dimmer_value_dmx)
 						grouped_dimming_last_slope = DIM_UP;
 					grouped_state = GROUPED_ON;
-				}
+//				}
 			}
 			break;
 
