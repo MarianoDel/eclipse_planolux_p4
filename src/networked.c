@@ -128,10 +128,10 @@ unsigned char FuncNetworked (unsigned char jump_menu)
 			}
 
 
-			if (networked_ii > 10)
-				RELAY_ON;
-			else if (networked_ii < 5)
-				RELAY_OFF;
+//			if (networked_ii > 10)
+//				RELAY_ON;
+//			else if (networked_ii < 5)
+//				RELAY_OFF;
 
 			if (networked_selections == MENU_OFF)
 			{

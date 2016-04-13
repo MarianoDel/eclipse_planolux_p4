@@ -106,7 +106,7 @@ unsigned char FuncStandAlone (void)
 		case STAND_ALONE_OFF_1:
 //			if (CheckACSw() == S_NO)	//liberaron el sw
 //			{
-				RELAY_ON;
+//				RELAY_ON;
 				if (standalone_selections == MENU_OFF)
 				{
 					LCD_1ER_RENGLON;
@@ -236,7 +236,7 @@ unsigned char FuncStandAlone (void)
 						LCD_1ER_RENGLON;
 						LCDTransmitStr((const char *) "  Lights OFF    ");
 					}
-					RELAY_OFF;
+//					RELAY_OFF;
 				}
 			}
 			break;
@@ -320,10 +320,10 @@ unsigned char FuncStandAlone (void)
 			{
 				standalone_enable_menu_timer = TT_MENU_TIMEOUT;
 				//standalone_state = STAND_ALONE_INIT;
-				if (RELAY)
+//				if (RELAY)
 					standalone_state = STAND_ALONE_ON;
-				else
-					standalone_state = STAND_ALONE_OFF;
+//				else
+//					standalone_state = STAND_ALONE_OFF;
 				standalone_selections++;
 			}
 
@@ -944,7 +944,7 @@ unsigned char FuncStandAloneCert (void)
 		case STAND_ALONE_OFF_1:
 //			if (CheckACSw() == S_NO)	//liberaron el sw
 //			{
-				RELAY_ON;
+//				RELAY_ON;
 				if (standalone_selections == MENU_OFF)
 				{
 					LCD_1ER_RENGLON;
@@ -1074,7 +1074,7 @@ unsigned char FuncStandAloneCert (void)
 						LCD_1ER_RENGLON;
 						LCDTransmitStr((const char *) "  Lights OFF    ");
 					}
-					RELAY_OFF;
+//					RELAY_OFF;
 				}
 			}
 			break;

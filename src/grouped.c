@@ -106,7 +106,7 @@ unsigned char FuncGrouped (void)
 		case GROUPED_OFF_1:
 //			if (CheckACSw() == S_NO)	//liberaron el sw
 //			{
-				RELAY_ON;
+//				RELAY_ON;
 				if (grouped_selections == MENU_OFF)
 				{
 					LCD_1ER_RENGLON;
@@ -253,7 +253,7 @@ unsigned char FuncGrouped (void)
 						LCD_1ER_RENGLON;
 						LCDTransmitStr((const char *) "  Lights OFF    ");
 					}
-					RELAY_OFF;
+//					RELAY_OFF;
 				}
 			}
 			break;
@@ -349,10 +349,10 @@ unsigned char FuncGrouped (void)
 			}
 
 
-			if (grouped_ii > 10)
-				RELAY_ON;
-			else if (grouped_ii < 5)
-				RELAY_OFF;
+//			if (grouped_ii > 10)
+//				RELAY_ON;
+//			else if (grouped_ii < 5)
+//				RELAY_OFF;
 
 			if (grouped_selections == MENU_OFF)
 			{
