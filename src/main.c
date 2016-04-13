@@ -62,7 +62,6 @@
 #include "adc.h"
 #include "flash_program.h"
 #include "main_menu.h"
-#include "synchro.h"
 #include "dmx_transceiver.h"
 #include "standalone.h"
 #include "grouped.h"
