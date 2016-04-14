@@ -129,17 +129,17 @@ void GPIO_Config (void)
 		GPIOA_CLK_ON;
 
 	temp = GPIOA->MODER;	//2 bits por pin
-	temp &= 0x3C000000;		//PA0 - PA5 out push_pull; PA6 alternate function; PA7 out push pull;
-	temp |= 0x01686555;		//PA8 input; PA9 PA10 alternativa; PA11 PA12 out push_pull; PA15 input
+	temp &= 0x3C000000;		//PA0 - PA4 out push_pull; PA5 analog; PA6 - PA11 alternate function;
+	temp |= 0x01666D55;		//PA12 out push_pull; PA15 input pull up
 	GPIOA->MODER = temp;
 
 	temp = GPIOA->OTYPER;	//1 bit por pin
-	temp &= 0xFFFFE700;
-	temp |= 0x00000000;		//PA0 a PA7 push pull; PA11 PA12 push pull
+	temp &= 0xFCFFFC00;
+	temp |= 0x00000000;		//PA0 - PA4 push pull; PA12 push pull
 	GPIOA->OTYPER = temp;
 
 	temp = GPIOA->OSPEEDR;	//2 bits por pin
-	temp &= 0xFC3F0000;
+	temp &= 0xFCFFFC00;
 	temp |= 0x00000000;		//low speed
 	GPIOA->OSPEEDR = temp;
 
@@ -158,23 +158,23 @@ void GPIO_Config (void)
 		GPIOB_CLK_ON;
 
 	temp = GPIOB->MODER;	//2 bits por pin
-	temp &= 0xFFFF0F30;		//PB0 analog input; PB1 PB3 input PB6 PB7 output
-	temp |= 0x00005003;
+	temp &= 0x0FFC0000;		//PB0 PB1 alternative; PB2 out; PB3 input; PB4 out; PB5 input; PB6 PB7 alternative
+	temp |= 0x5000A11A;		//PB8 input; PB14 PB15 out
 	GPIOB->MODER = temp;
 
 	temp = GPIOB->OTYPER;	//1 bit por pin
-	temp &= 0xFFFFFF3F;
-	temp |= 0x00000040;		//PB6 open drain PB7 push pull
+	temp &= 0xFFFFFFFF;
+	temp |= 0x00000000;
 	GPIOB->OTYPER = temp;
 
 	temp = GPIOB->OSPEEDR;	//2 bits por pin
-	temp &= 0xFFFF0FFF;
+	temp &= 0x0FFFFCCF;
 	temp |= 0x00000000;		//low speed
 	GPIOB->OSPEEDR = temp;
 
 	temp = GPIOB->PUPDR;	//2 bits por pin
-	temp &= 0xFFFFFF33;		//PB1 PB3 pull up
-	temp |= 0x00000044;
+	temp &= 0xFFFFF33F;		//PB3 PB5 pull up
+	temp |= 0x00000440;
 	GPIOB->PUPDR = temp;
 
 	//Alternate Fuction

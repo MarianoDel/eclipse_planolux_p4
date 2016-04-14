@@ -182,7 +182,6 @@ volatile unsigned short secs = 0;
 
 
 // ------- del display -------
-unsigned char v_opt [10];
 
 
 // ------- del DMX -------
@@ -205,15 +204,15 @@ unsigned char vd4 [LARGO_F + 1];
 #define LOOK_FOR_MARK	2
 #define LOOK_FOR_START	3
 
-//--- FUNCIONES DEL MODULO ---//
+//-------- FUNCIONES DEL MODULO --------//
 void TimingDelay_Decrement(void);
 void Update_PWM (unsigned short);
 void UpdatePackets (void);
-// ------- del display -------
+
+// ------- Funciones del display -------
 
 
-
-// ------- del DMX -------
+// ------- Funciones del DMX -------
 extern void EXTI4_15_IRQHandler(void);
 #define DMX_TIMEOUT	20
 unsigned char MAFilter (unsigned char, unsigned char *);
@@ -289,7 +288,6 @@ int main(void)
 	TIM_3_Init();
 	TIM_14_Init();
 	TIM_16_Init();		//para OneShoot() cuando funciona en modo master
-	TIM_17_Init();		//lo uso para el ADC de Igrid
 
 	//--- PRUEBA DISPLAY LCD ---
 	EXTIOff ();
