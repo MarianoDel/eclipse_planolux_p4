@@ -91,6 +91,29 @@ typedef struct Grouped
 
 #define GROUPED_INITIAL_CHANNEL		1
 
+//estados del menu GROUPED CERT para certificacion
+#define GROUPED_MENU_CERT_INIT_0			0
+#define GROUPED_MENU_CERT_INIT_1			1
+#define GROUPED_MENU_CERT_INIT_UP			2
+#define GROUPED_MENU_CERT_INIT_DOWN			3
+#define GROUPED_MENU_CERT_TEMP_0			4
+#define GROUPED_MENU_CERT_TEMP_1			5
+#define GROUPED_MENU_CERT_TEMP_UP			6
+#define GROUPED_MENU_CERT_TEMP_DOWN			7
+#define GROUPED_MENU_CERT_CURRENT_0			8
+#define GROUPED_MENU_CERT_CURRENT_1			9
+#define GROUPED_MENU_CERT_CURRENT_UP		10
+#define GROUPED_MENU_CERT_CURRENT_DOWN		11
+#define GROUPED_MENU_CERT_UPTIME_0			12
+#define GROUPED_MENU_CERT_UPTIME_1			13
+#define GROUPED_MENU_CERT_UPTIME_UP			14
+#define GROUPED_MENU_CERT_UPTIME_DOWN		15
+#define GROUPED_MENU_CERT_1TO10_0			16
+#define GROUPED_MENU_CERT_1TO10_1			17
+#define GROUPED_MENU_CERT_1TO10_UP			18
+#define GROUPED_MENU_CERT_1TO10_DOWN		19
+
+
 //estados de Menu Selections
 #define MENU_ON			0
 #define MENU_SELECTED	1
@@ -122,5 +145,8 @@ unsigned char MenuGrouped (void);
 
 void FuncGroupedReset (void);
 void MenuGroupedReset (void);
+
+unsigned char FuncGroupedCert (void);
+void MenuGroupedCert(void);
 
 #endif /* GROUPED_H_ */

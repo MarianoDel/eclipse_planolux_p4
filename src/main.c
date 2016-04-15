@@ -166,6 +166,9 @@ const char s_blank_line [] = {"                "};
 unsigned short s1;
 unsigned short s2;
 
+//-------- Externals para Certificacion -----
+float fcalc = 0.0;
+
 
 //--- VARIABLES GLOBALES ---//
 parameters_typedef param_struct;
@@ -372,7 +375,7 @@ int main(void)
 
 	while (1)
 	{
-		resp = FuncStandAloneCert();
+		resp = FuncGroupedCert();
 
 
 		UpdateSwitches();

@@ -16,6 +16,7 @@
 //#include "standalone.h"
 #include "dmx_transceiver.h"
 #include "stm32f0x_gpio.h"
+#include "adc.h"
 
 
 /* Externals variables ---------------------------------------------------------*/
@@ -30,6 +31,10 @@ extern volatile unsigned short standalone_enable_menu_timer;
 
 #define grouped_timer standalone_timer
 #define grouped_enable_menu_timer standalone_enable_menu_timer
+
+extern volatile unsigned short minutes;
+extern volatile unsigned short scroll1_timer;
+
 
 extern const char * s_blank_line [];
 
@@ -51,6 +56,15 @@ unsigned char grouped_dimming_last_slope = 0;
 
 unsigned char grouped_menu_state = 0;
 
+//-------------- Para Certificacion --------------//
+unsigned short grouped_last_temp = 0;
+unsigned short grouped_last_current = 0;
+unsigned short grouped_last_minutes = 0;
+unsigned short grouped_last_1to10 = 0;
+
+extern float fcalc;
+#define K_1TO10	0.0392
+#define K_CURR	0.000127
 
 
 const unsigned char s_sel_g [] = { 0x02, 0x08, 0x0f };
@@ -1034,3 +1048,362 @@ void MenuGroupedReset(void)
 	grouped_menu_state = GROUPED_MENU_INIT;
 }
 
+unsigned char FuncGroupedCert (void)
+{
+	unsigned char resp = RESP_CONTINUE;
+	unsigned char resp_down = RESP_CONTINUE;
+
+	switch (grouped_state)
+	{
+		case GROUPED_INIT:
+			//un segundo la pantalla principal
+			grouped_timer = 1000;
+			grouped_enable_menu_timer = TT_MENU_TIMEOUT;	//30 segs de menu standalone
+
+			//TODO: leer estructura y verificar funcion cargar valore sdefualt o ultimos seleccioneados
+			memcpy(&GroupedStruct_local, &GroupedStruct_constant, sizeof(GroupedStruct_local));
+			MenuGroupedReset();
+
+		case GROUPED_UPDATE:
+			//siempre slave para la certificacion
+			EXTIOn ();
+			grouped_state = GROUPED_SLAVE_INIT;
+
+			break;
+
+		case GROUPED_SLAVE_INIT:
+			DMX_channel_quantity = 4;
+			DMX_channel_selected = GroupedStruct_local.grouped_dmx_channel;
+			DMX_Ena();
+
+			LCD_1ER_RENGLON;
+			LCDTransmitStr((const char *) "Dimmer:         ");
+			grouped_state++;
+			break;
+
+		case GROUPED_SLAVE_WORKING:
+			//me quedo aca hasta que me saquen por menu
+
+			if (Packet_Detected_Flag)
+			{
+				//llego un paquete DMX
+				Packet_Detected_Flag = 0;
+
+				//en data tengo la info
+				Update_TIM3_CH1 (data[0]);
+				grouped_ii = data[0];
+			}
+
+			if (grouped_slave_dim_last != grouped_ii)
+			{
+				unsigned char i;
+				unsigned short ii;
+				char s_lcd [20];
+
+				grouped_slave_dim_last = grouped_ii;
+
+				ii = grouped_slave_dim_last * 100;
+				ii = ii / 255;
+				if (ii > 100)
+					ii = 100;
+
+				//LCD_1ER_RENGLON;
+				Lcd_SetDDRAM(0x00 + 8);
+				sprintf(s_lcd, "%3d", ii);
+				LCDTransmitStr(s_lcd);
+				LCDTransmitStr("%");
+
+				/*
+				//RUTINA DE AVANCE DE LA LINEA DE DIMMER
+				ii = ii / 10;
+				if (grouped_slave_dim2_last != ii)
+				{
+					grouped_slave_dim2_last = ii;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "            ");
+					LCD_2DO_RENGLON;
+					for (i = 0; i < ii; i++)
+					{
+						LCDStartTransmit(0xff);
+					}
+				}
+				*/
+			}
+			break;
+
+		default:
+			grouped_state = GROUPED_INIT;
+			break;
+	}
+
+	//solo uso segundo renglon para el MenuStandAloneCert()
+	MenuGroupedCert();
+
+	if (CheckS1() > S_HALF)
+		resp = RESP_CHANGE_ALL_UP;
+
+	return resp;
+}
+
+void MenuGroupedCert(void)
+{
+	char s_lcd [20];
+	unsigned short local_meas = 0;
+	short one_int = 0;
+	short one_dec = 0;
+
+
+	switch (grouped_menu_state)
+	{
+		case GROUPED_MENU_CERT_INIT_0:
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Check Conf...   ");
+			grouped_menu_state++;
+			break;
+
+		case GROUPED_MENU_CERT_INIT_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				grouped_menu_state = GROUPED_MENU_CERT_INIT_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				grouped_menu_state = GROUPED_MENU_CERT_INIT_DOWN;
+			}
+			break;
+
+		case GROUPED_MENU_CERT_INIT_UP:
+			if (CheckS2() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_TEMP_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_INIT_DOWN:
+			if (CheckS1() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_INIT_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_TEMP_0:
+			grouped_menu_state++;
+			grouped_last_temp = 0;	//fuerzo el cambio
+			break;
+
+		case GROUPED_MENU_CERT_TEMP_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				grouped_menu_state = GROUPED_MENU_CERT_TEMP_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				grouped_menu_state = GROUPED_MENU_CERT_TEMP_DOWN;
+			}
+
+			local_meas = GetTemp();
+			if (grouped_last_temp != local_meas)
+			{
+				grouped_last_temp = local_meas;
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "Brd Temp:       ");
+				local_meas = ConvertTemp(local_meas);
+				sprintf(s_lcd, "%d", local_meas);
+				Lcd_SetDDRAM(0x40 + 10);
+				LCDTransmitStr(s_lcd);
+			}
+			break;
+
+		case GROUPED_MENU_CERT_TEMP_UP:
+			if (CheckS2() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_CURRENT_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_TEMP_DOWN:
+			if (CheckS1() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_INIT_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_CURRENT_0:
+			grouped_last_current = 0;
+			grouped_menu_state++;
+			break;
+
+		case GROUPED_MENU_CERT_CURRENT_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				grouped_menu_state = GROUPED_MENU_CERT_CURRENT_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				grouped_menu_state = GROUPED_MENU_CERT_CURRENT_DOWN;
+			}
+
+			//refresco dos veces por segundo
+			if (!scroll1_timer)
+			{
+				scroll1_timer = 500;
+				//local_meas = GetIGrid();
+				/*
+				if (standalone_last_current != local_meas)
+				{
+					standalone_last_current = local_meas;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "Drvr Cur:       ");
+					fcalc = local_meas;
+					fcalc = fcalc * K_CURR;
+					one_int = (short) fcalc;
+					fcalc = fcalc - one_int;
+					fcalc = fcalc * 1000;
+					one_dec = (short) fcalc;
+
+					sprintf(s_lcd, "%01d.%03d A", one_int, one_dec);
+					Lcd_SetDDRAM(0x40 + 10);
+					LCDTransmitStr(s_lcd);
+				}
+				*/
+			}
+
+			break;
+
+		case GROUPED_MENU_CERT_CURRENT_UP:
+			if (CheckS2() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_UPTIME_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_CURRENT_DOWN:
+			if (CheckS1() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_TEMP_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_UPTIME_0:
+			if (!minutes)						//para forzar arranque
+				grouped_last_minutes = 1;
+			else
+				grouped_last_minutes = 0;
+
+			grouped_menu_state++;
+			break;
+
+		case GROUPED_MENU_CERT_UPTIME_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				grouped_menu_state = GROUPED_MENU_CERT_UPTIME_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				grouped_menu_state = GROUPED_MENU_CERT_UPTIME_DOWN;
+			}
+
+			if (grouped_last_minutes != minutes)
+			{
+				grouped_last_minutes = minutes;
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "Uptime:         ");
+				sprintf(s_lcd, "%d min", minutes);
+				Lcd_SetDDRAM(0x40 + 8);
+				LCDTransmitStr(s_lcd);
+			}
+
+			break;
+
+		case GROUPED_MENU_CERT_UPTIME_UP:
+			if (CheckS2() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_1TO10_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_UPTIME_DOWN:
+			if (CheckS1() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_CURRENT_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_1TO10_0:
+			grouped_last_1to10 = 65000;		//fuerzo el update
+			grouped_menu_state++;
+			break;
+
+		case GROUPED_MENU_CERT_1TO10_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				grouped_menu_state = GROUPED_MENU_CERT_1TO10_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				grouped_menu_state = GROUPED_MENU_CERT_1TO10_DOWN;
+			}
+
+			//refresco dos veces por segundo
+			if (!scroll1_timer)
+			{
+				scroll1_timer = 500;
+				local_meas = TIM3->CCR1;
+				if (grouped_last_1to10 != local_meas)
+				{
+					grouped_last_1to10 = local_meas;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "1 to 10V:       ");
+					fcalc = local_meas;
+					fcalc = fcalc * K_1TO10;
+					one_int = (short) fcalc;
+					fcalc = fcalc - one_int;
+					fcalc = fcalc * 10;
+					one_dec = (short) fcalc;
+
+					sprintf(s_lcd, "%02d.%01d V", one_int, one_dec);
+					Lcd_SetDDRAM(0x40 + 10);
+					LCDTransmitStr(s_lcd);
+				}
+			}
+			break;
+
+		case GROUPED_MENU_CERT_1TO10_UP:
+			if (CheckS2() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_INIT_0;
+
+			break;
+
+		case GROUPED_MENU_CERT_1TO10_DOWN:
+			if (CheckS1() == S_NO)
+				grouped_menu_state = GROUPED_MENU_CERT_UPTIME_0;
+
+			break;
+
+		default:
+			grouped_menu_state = GROUPED_MENU_CERT_INIT_0;
+			break;
+	}
+}
+
+void MenuGroupedResetCert(void)
+{
+	grouped_menu_state = GROUPED_MENU_INIT;
+}

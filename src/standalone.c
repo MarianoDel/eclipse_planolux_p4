@@ -45,11 +45,12 @@ unsigned short standalone_last_current = 0;
 unsigned short standalone_last_minutes = 0;
 unsigned short standalone_last_1to10 = 0;
 
-const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
-
-float fcalc = 0.0;
+extern float fcalc;
 #define K_1TO10	0.0392
 #define K_CURR	0.000127
+
+const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
+
 
 
 StandAlone_Typedef StandAloneStruct_local;
