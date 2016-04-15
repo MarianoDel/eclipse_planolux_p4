@@ -38,7 +38,7 @@
 void GPIO_Config (void)
 {
 	unsigned long temp;
-	EXTI_InitTypeDef EXTI_InitStructure;
+	//EXTI_InitTypeDef EXTI_InitStructure;
 //	NVIC_InitTypeDef NVIC_InitStructure;
 
 
@@ -67,61 +67,6 @@ void GPIO_Config (void)
 	//10: Pull-down
 	//11: Reserved
 
-#ifdef VER_1_2
-	//--- GPIO A ---//
-	if (!GPIOA_CLK)
-		GPIOA_CLK_ON;
-
-	temp = GPIOA->MODER;	//2 bits por pin
-	temp &= 0x0C000000;		//PA0 - PA5 out push_pull; PA6 PA7 alternate function;
-	temp |= 0x0168A555;		//PA8 input; PA9 PA10 alternativa; PA11 PA12 out push_pull; PA14 PA15 input
-	GPIOA->MODER = temp;
-
-	temp = GPIOA->OTYPER;	//1 bit por pin
-	temp &= 0xFFFFE700;
-	temp |= 0x00000000;		//PA0 a PA7 push pull; PA11 PA12 push pull
-	GPIOA->OTYPER = temp;
-
-	temp = GPIOA->OSPEEDR;	//2 bits por pin
-	temp &= 0xFC3F0000;
-	temp |= 0x00000000;		//low speed
-	GPIOA->OSPEEDR = temp;
-
-	temp = GPIOA->PUPDR;	//2 bits por pin
-	temp &= 0x0FFFFFFF;
-	temp |= 0x50000000;		//PA14 PA15 con pullup
-	GPIOA->PUPDR = temp;
-
-	//Alternate Fuction
-	//GPIOA->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
-
-	//--- GPIO B ---//
-	if (!GPIOB_CLK)
-		GPIOB_CLK_ON;
-
-	temp = GPIOB->MODER;	//2 bits por pin
-	temp &= 0xFFFF0030;		//PB0 PB1 analog input; PB3 input; PB4 output; PB5 input; PB6 PB7 output
-	temp |= 0x0000510F;
-	GPIOB->MODER = temp;
-
-	temp = GPIOB->OTYPER;	//1 bit por pin
-	temp &= 0xFFFFFF3F;
-	temp |= 0x00000040;		//PB6 open drain PB7 push pull
-	GPIOB->OTYPER = temp;
-
-	temp = GPIOB->OSPEEDR;	//2 bits por pin
-	temp &= 0xFFFF0FFF;
-	temp |= 0x00000000;		//low speed
-	GPIOB->OSPEEDR = temp;
-
-	temp = GPIOB->PUPDR;	//2 bits por pin
-	temp &= 0xFFFFF33F;		//PB3 PB5 pull up
-	temp |= 0x00000440;
-	GPIOB->PUPDR = temp;
-
-	//Alternate Fuction
-	//GPIOB->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
-#endif
 
 #ifdef VER_1_0
 	//--- GPIO A ---//
@@ -188,7 +133,7 @@ void GPIO_Config (void)
 		GPIOF_CLK_ON;
 
 	temp = GPIOF->MODER;
-	temp &= 0xFFFFFFFF;
+	temp &= 0xFFFF3FFF;		//PF7 input
 	temp |= 0x00000000;
 	GPIOF->MODER = temp;
 
@@ -203,8 +148,8 @@ void GPIO_Config (void)
 	GPIOF->OSPEEDR = temp;
 
 	temp = GPIOF->PUPDR;
-	temp &= 0xFFFFFFFF;
-	temp |= 0x00000000;
+	temp &= 0xFFFF3FFF;
+	temp |= 0x00004000;
 	GPIOF->PUPDR = temp;
 
 #endif
@@ -215,11 +160,12 @@ void GPIO_Config (void)
 	//EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	//EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	//EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line8;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+
+	//EXTI_InitStructure.EXTI_Line = EXTI_Line8;
+	//EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	//EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	//EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	//EXTI_Init(&EXTI_InitStructure);
 
 		//GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource12);
 
@@ -237,17 +183,16 @@ void GPIO_Config (void)
 	NVIC_Init(&NVIC_InitStructure);
 	*/
 
-	/*
-	SYSCFG->EXTICR[3] = 0x00000000; //Select Port A for pin 8 external interrupt by writing 0000 in EXTI3
-	EXTI->IMR = 0x0010; //Configure the corresponding mask bit in the EXTI_IMR register
-	EXTI->EMR = 0x0010; //Configure the corresponding mask bit in the EXTI_IMR register
-	EXTI->RTSR = 0x0010; //Configure the Trigger Selection bits of the Interrupt line on rising edge
-	EXTI->FTSR = 0x0010; //Configure the Trigger Selection bits of the Interrupt line on falling edge
-	*/
+
+	//en SYSCFG tengo los pines de los ports que redirecciono al EXTI
+	SYSCFG->EXTICR[2] = 0x00000001; //Select Port B for pin 8 external interrupt by writing 0001 in EXTI3
+	EXTI->IMR = 0x0100; //Configure the corresponding mask bit in the EXTI_IMR register
+	//EXTI->EMR = 0x0100; //Configure the corresponding mask bit in the EXTI_EMR register
+	EXTI->RTSR = 0x0100; //Configure the Trigger Selection bits of the Interrupt line on rising edge
+	EXTI->FTSR = 0x0100; //Configure the Trigger Selection bits of the Interrupt line on falling edge
+
 	NVIC_EnableIRQ(EXTI4_15_IRQn);
 	NVIC_SetPriority(EXTI4_15_IRQn, 6);
-
-
 }
 
 inline void EXTIOff (void)
