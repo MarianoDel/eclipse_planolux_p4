@@ -18,7 +18,9 @@
 #include "stm32f0xx_gpio.h"
 #include "stm32f0xx_misc.h"
 #include "stm32f0xx_exti.h"
+#include "stm32f0xx_syscfg.h"
 
+#include "stm32f0xx.h"
 #include "hard.h"
 
 
@@ -38,7 +40,7 @@
 void GPIO_Config (void)
 {
 	unsigned long temp;
-	//EXTI_InitTypeDef EXTI_InitStructure;
+//	EXTI_InitTypeDef EXTI_InitStructure;
 //	NVIC_InitTypeDef NVIC_InitStructure;
 
 
@@ -76,6 +78,10 @@ void GPIO_Config (void)
 	temp = GPIOA->MODER;	//2 bits por pin
 	temp &= 0x3C000000;		//PA0 - PA4 out push_pull; PA5 analog; PA6 - PA11 alternate function;
 	temp |= 0x01666D55;		//PA12 out push_pull; PA15 input pull up
+
+//	temp &= 0x3C000000;		//PRUEBAS PA0 - PA4 out push_pull; PA5 input; PA6 - PA11 alternate function;
+//	temp |= 0x01666155;		//PRUEBAS PA12 out push_pull; PA15 input pull up
+
 	GPIOA->MODER = temp;
 
 	temp = GPIOA->OTYPER;	//1 bit por pin
@@ -154,41 +160,28 @@ void GPIO_Config (void)
 
 #endif
 
-
-	//EXTI_InitStructure.EXTI_Line = EXTI_Line0;
-	//EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	//EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	//EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	//EXTI_Init(&EXTI_InitStructure);
-
-	//EXTI_InitStructure.EXTI_Line = EXTI_Line8;
-	//EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	//EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	//EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	//EXTI_Init(&EXTI_InitStructure);
-
-		//GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource12);
-
-	// Enable and set Button EXTI Interrupt to the lowest priority
-	//NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-	//NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-	//NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-	//NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
 	/*
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_15_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPriority = 0x5;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	if (!SYSCFG_CLK)
+		SYSCFG_CLK_ON;
 
-	NVIC_Init(&NVIC_InitStructure);
+	SYSCFG->EXTICR[1] = 0x00000010; //Select Port B for pin 5 external int; EXTI5 = 0001 in EXTICR2
+
+	EXTI->IMR = 0x0020; //Configure the corresponding mask bit in the EXTI_IMR register
+	//EXTI->EMR = 0x0100; //Configure the corresponding mask bit in the EXTI_EMR register
+	EXTI->RTSR = 0x0000; //Configure the Trigger Selection bits of the Interrupt line on rising edge
+	EXTI->FTSR = 0x0020; //Configure the Trigger Selection bits of the Interrupt line on falling edge
+
+	NVIC_EnableIRQ(EXTI4_15_IRQn);
+	NVIC_SetPriority(EXTI4_15_IRQn, 6);
 	*/
 
+	if (!SYSCFG_CLK)
+		SYSCFG_CLK_ON;
 
-	//en SYSCFG tengo los pines de los ports que redirecciono al EXTI
-	SYSCFG->EXTICR[2] = 0x00000001; //Select Port B for pin 8 external interrupt by writing 0001 in EXTI3
+	SYSCFG->EXTICR[2] = 0x00000001; //Select Port B for pin 8 external int; EXTI8 = 0001 in EXTICR3
 	EXTI->IMR = 0x0100; //Configure the corresponding mask bit in the EXTI_IMR register
 	//EXTI->EMR = 0x0100; //Configure the corresponding mask bit in the EXTI_EMR register
-	EXTI->RTSR = 0x0100; //Configure the Trigger Selection bits of the Interrupt line on rising edge
+	EXTI->RTSR = 0x0000; //Configure the Trigger Selection bits of the Interrupt line on rising edge
 	EXTI->FTSR = 0x0100; //Configure the Trigger Selection bits of the Interrupt line on falling edge
 
 	NVIC_EnableIRQ(EXTI4_15_IRQn);

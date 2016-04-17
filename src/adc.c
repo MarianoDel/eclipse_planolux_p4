@@ -10,6 +10,7 @@
 #include "stm32f0xx_adc.h"
 //la incluyo por constates como ADC_SampleTime_239_5Cycles
 
+#define CALIBRATION_TIMEOUT       ((uint32_t)0x0000F000)
 
 //--- VARIABLES EXTERNAS ---//
 extern volatile unsigned short adc_ch [];
@@ -84,7 +85,8 @@ void AdcConfig (void)
 #endif
 
 	//calibrar ADC
-	cal = ADC_GetCalibrationFactor(ADC1);
+	//cal = ADC_GetCalibrationFactor(ADC1);
+	cal = ADCGetCal(ADC1);
 
 	// Enable ADC1
 	ADC1->CR |= ADC_CR_ADEN;
@@ -259,6 +261,40 @@ unsigned short ReadADC1Check (unsigned char channel)
 	ADC1->CHSELR = 0x00000001;	//solo convierto CH0
 
 	return 1;
+}
+
+/**
+  * @brief  Active the Calibration operation for the selected ADC.
+  * @note   The Calibration can be initiated only when ADC is still in the
+  *         reset configuration (ADEN must be equal to 0).
+  * @param  ADCx: where x can be 1 to select the ADC1 peripheral.
+  * @retval ADC Calibration factor
+  */
+uint32_t ADCGetCal (ADC_TypeDef* ADCx)
+{
+  uint32_t tmpreg = 0, calibrationcounter = 0, calibrationstatus = 0;
+
+  /* Set the ADC calibartion */
+  ADCx->CR |= (uint32_t)ADC_CR_ADCAL;
+
+  /* Wait until no ADC calibration is completed */
+  do
+  {
+    calibrationstatus = ADCx->CR & ADC_CR_ADCAL;
+    calibrationcounter++;
+  } while((calibrationcounter != CALIBRATION_TIMEOUT) && (calibrationstatus != 0x00));
+
+  if((uint32_t)(ADCx->CR & ADC_CR_ADCAL) == RESET)
+  {
+    /*Get the calibration factor from the ADC data register */
+    tmpreg = ADCx->DR;
+  }
+  else
+  {
+    /* Error factor */
+    tmpreg = 0x00000000;
+  }
+  return tmpreg;
 }
 
 void UpdateTemp(void)

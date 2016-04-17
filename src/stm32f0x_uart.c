@@ -264,7 +264,8 @@ void USART1Config(void)
 	if (!USART1_CLK)
 		USART1_CLK_ON;
 
-	GPIOA->AFR[1] |= 0x0000110;	//PA10 -> AF1 PA9 -> AF1
+	//USART1 en PB6 y PB7
+	//GPIOA->AFR[1] |= 0x0000110;	//PA10 -> AF1 PA9 -> AF1
 
 	USART1->BRR = USART_250000;
 	USART1->CR2 |= USART_CR2_STOP_1;	//2 bits stop

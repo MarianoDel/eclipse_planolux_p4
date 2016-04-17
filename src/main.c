@@ -216,6 +216,8 @@ void UpdatePackets (void);
 
 
 // ------- Funciones del DMX -------
+void DMXCleanFlags(void);
+extern void EXTI2_3_IRQHandler(void);
 extern void EXTI4_15_IRQHandler(void);
 #define DMX_TIMEOUT	20
 unsigned char MAFilter (unsigned char, unsigned char *);
@@ -292,6 +294,7 @@ int main(void)
 	TIM_14_Init();
 	TIM_16_Init();		//para OneShoot() cuando funciona en modo master
 
+
 	//--- PRUEBA DISPLAY LCD ---
 	EXTIOff ();
 	LCDInit();
@@ -310,16 +313,12 @@ int main(void)
 	while (FuncShowBlink ((const char *) "Kirno Technology", (const char *) "  Smart Driver  ", 2, BLINK_NO) != RESP_FINISH);
 	LED_OFF;
 
-	//TODO: PARA PRUEBAS UTILIZAR BRANCH MASTER
-	//ESTE SOLO INCLUYE FUNCIONES DE PRE CERTIFICACION
-	//DE PRODUCCION Y PARA PRUEBAS EN DMX
-	/*
-	Packet_Detected_Flag = 0;
+	DMXCleanFlags();
 	DMX_channel_selected = 1;
 	DMX_channel_quantity = 4;
 	USART1Config();
 	EXTIOff();
-	*/
+
 
 	Update_TIM3_CH2 (255);
 
@@ -387,6 +386,9 @@ int main(void)
 	return 0;
 }
 
+//--- End of Main ---//
+
+
 void UpdatePackets (void)
 {
 	if (Packet_Detected_Flag)
@@ -400,7 +402,14 @@ void UpdatePackets (void)
 		Packet_Detected_Flag = 0;
 	}
 }
-//--- End of Main ---//
+
+void DMXCleanFlags(void)
+{
+	Packet_Detected_Flag = 0;
+	DMX_packet_flag = 0;
+	RDM_packet_flag = 0;
+}
+
 void Update_PWM (unsigned short pwm)
 {
 	Update_TIM3_CH1 (pwm);
@@ -445,15 +454,23 @@ unsigned short MAFilter16 (unsigned char new_sample, unsigned char * vsample)
     return total_ma >> DIVISOR_F;
 }
 
-
-
-
-
 void EXTI4_15_IRQHandler(void)
 {
 	unsigned short aux;
 
+	//para prueba INT
+	if(EXTI->PR & 0x0100)	//Line8
+	{
+		EXTI->PR |= 0x0100;
 
+		if (LED)
+			LED_OFF;
+		else
+			LED_ON;
+
+	}
+
+	/*
 	if(EXTI->PR & 0x0100)	//Line8
 	{
 
@@ -531,6 +548,7 @@ void EXTI4_15_IRQHandler(void)
 
 		EXTI->PR |= 0x0100;
 	}
+	*/
 }
 
 void TimingDelay_Decrement(void)

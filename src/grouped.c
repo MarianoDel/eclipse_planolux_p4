@@ -38,7 +38,8 @@ extern volatile unsigned short scroll1_timer;
 
 extern const char * s_blank_line [];
 
-extern volatile unsigned char Packet_Detected_Flag;
+// ------- Externals del DMX -------
+extern volatile unsigned char DMX_packet_flag;
 extern volatile unsigned short DMX_channel_selected;
 extern volatile unsigned char DMX_channel_quantity;
 
@@ -352,10 +353,10 @@ unsigned char FuncGrouped (void)
 		case GROUPED_SLAVE_WORKING:
 			//me quedo aca hasta que me saquen por menu
 
-			if (Packet_Detected_Flag)
+			if (DMX_packet_flag)
 			{
 				//llego un paquete DMX
-				Packet_Detected_Flag = 0;
+				DMX_packet_flag = 0;
 
 				//en data tengo la info
 				Update_TIM3_CH1 (data[0]);
@@ -1084,10 +1085,9 @@ unsigned char FuncGroupedCert (void)
 		case GROUPED_SLAVE_WORKING:
 			//me quedo aca hasta que me saquen por menu
 
-			if (Packet_Detected_Flag)
+			if (DMX_packet_flag)	//llego un paquete DMX
 			{
-				//llego un paquete DMX
-				Packet_Detected_Flag = 0;
+				DMX_packet_flag = 0;
 
 				//en data tengo la info
 				Update_TIM3_CH1 (data[0]);

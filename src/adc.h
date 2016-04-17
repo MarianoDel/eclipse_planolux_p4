@@ -8,6 +8,8 @@
 #ifndef ADC_H_
 #define ADC_H_
 
+#include "stm32f0xx.h"
+
 #define RCC_ADC_CLK 		(RCC->APB2ENR & 0x00000200)
 #define RCC_ADC_CLK_ON 		RCC->APB2ENR |= 0x00000200
 #define RCC_ADC_CLK_OFF 	RCC->APB2ENR &= ~0x00000200
@@ -29,5 +31,6 @@ void UpdateTemp(void);
 unsigned short GetTemp (void);
 void AdcConfig (void);
 short ConvertTemp (unsigned short);
+uint32_t ADCGetCal (ADC_TypeDef*);
 
 #endif /* ADC_H_ */

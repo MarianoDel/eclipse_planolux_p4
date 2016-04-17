@@ -30,6 +30,8 @@
 
 //GPIOA pin5
 //ADC para LDR
+//#define LDR ((GPIOA->IDR & 0x0020) == 0)	//para pruebas
+
 
 //GPIOA pin6
 //para TIM3_CH1
