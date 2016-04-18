@@ -376,7 +376,6 @@ int main(void)
 	{
 		resp = FuncGroupedCert();
 
-
 		UpdateSwitches();
 		UpdatePackets();
 		UpdateTemp();
@@ -458,6 +457,7 @@ void EXTI4_15_IRQHandler(void)
 {
 	unsigned short aux;
 
+	/*
 	//para prueba INT
 	if(EXTI->PR & 0x0100)	//Line8
 	{
@@ -469,8 +469,9 @@ void EXTI4_15_IRQHandler(void)
 			LED_ON;
 
 	}
+	*/
 
-	/*
+
 	if(EXTI->PR & 0x0100)	//Line8
 	{
 
@@ -548,7 +549,7 @@ void EXTI4_15_IRQHandler(void)
 
 		EXTI->PR |= 0x0100;
 	}
-	*/
+
 }
 
 void TimingDelay_Decrement(void)

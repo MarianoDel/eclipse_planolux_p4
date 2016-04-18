@@ -181,7 +181,7 @@ void GPIO_Config (void)
 	SYSCFG->EXTICR[2] = 0x00000001; //Select Port B for pin 8 external int; EXTI8 = 0001 in EXTICR3
 	EXTI->IMR = 0x0100; //Configure the corresponding mask bit in the EXTI_IMR register
 	//EXTI->EMR = 0x0100; //Configure the corresponding mask bit in the EXTI_EMR register
-	EXTI->RTSR = 0x0000; //Configure the Trigger Selection bits of the Interrupt line on rising edge
+	EXTI->RTSR = 0x0100; //Configure the Trigger Selection bits of the Interrupt line on rising edge
 	EXTI->FTSR = 0x0100; //Configure the Trigger Selection bits of the Interrupt line on falling edge
 
 	NVIC_EnableIRQ(EXTI4_15_IRQn);

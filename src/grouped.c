@@ -1090,8 +1090,11 @@ unsigned char FuncGroupedCert (void)
 				DMX_packet_flag = 0;
 
 				//en data tengo la info
-				Update_TIM3_CH1 (data[0]);
-				grouped_ii = data[0];
+				Update_TIM3_CH1 (data[1]);
+				Update_TIM3_CH2 (data[2]);
+				Update_TIM3_CH3 (data[3]);
+				Update_TIM3_CH4 (data[4]);
+				grouped_ii = data[2];
 			}
 
 			if (grouped_slave_dim_last != grouped_ii)
