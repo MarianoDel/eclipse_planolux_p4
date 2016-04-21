@@ -320,8 +320,6 @@ int main(void)
 	EXTIOff();
 
 
-	Update_TIM3_CH2 (255);
-
 	//---------- Prueba temp --------//
 	/*
 	while (1)

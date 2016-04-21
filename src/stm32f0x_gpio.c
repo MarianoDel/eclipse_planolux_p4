@@ -77,7 +77,7 @@ void GPIO_Config (void)
 
 	temp = GPIOA->MODER;	//2 bits por pin
 	temp &= 0x3C000000;		//PA0 - PA4 out push_pull; PA5 analog; PA6 - PA11 alternate function;
-	temp |= 0x01666D55;		//PA12 out push_pull; PA15 input pull up
+	temp |= 0x01AAAD55;		//PA12 out push_pull; PA15 input pull up
 
 //	temp &= 0x3C000000;		//PRUEBAS PA0 - PA4 out push_pull; PA5 input; PA6 - PA11 alternate function;
 //	temp |= 0x01666155;		//PRUEBAS PA12 out push_pull; PA15 input pull up
