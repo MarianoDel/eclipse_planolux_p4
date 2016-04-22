@@ -17,6 +17,7 @@
 #include "dmx_transceiver.h"
 #include "stm32f0x_gpio.h"
 #include "adc.h"
+#include "dsp.h"
 
 
 /* Externals variables ---------------------------------------------------------*/
@@ -28,6 +29,7 @@ extern volatile unsigned char grouped_master_timeout_timer;
 extern volatile unsigned short standalone_timer;
 extern volatile unsigned short standalone_enable_menu_timer;
 
+extern volatile unsigned char filter_timer;
 
 #define grouped_timer standalone_timer
 #define grouped_enable_menu_timer standalone_enable_menu_timer
@@ -46,6 +48,13 @@ extern volatile unsigned char DMX_channel_quantity;
 #define SIZEOF_DATA1	512
 extern volatile unsigned char data1[];
 extern volatile unsigned char data[];
+
+extern unsigned char vd0 [];
+extern unsigned char vd1 [];
+extern unsigned char vd2 [];
+extern unsigned char vd3 [];
+extern unsigned char vd4 [];
+
 
 /* Global variables ------------------------------------------------------------*/
 unsigned char grouped_state = 0;			//TODO: esto puede compartir RAM con standalone
@@ -1052,7 +1061,8 @@ void MenuGroupedReset(void)
 unsigned char FuncGroupedCert (void)
 {
 	unsigned char resp = RESP_CONTINUE;
-	unsigned char resp_down = RESP_CONTINUE;
+	//unsigned char resp_down = RESP_CONTINUE;
+	unsigned char data_local [4];
 
 	switch (grouped_state)
 	{
@@ -1089,12 +1099,44 @@ unsigned char FuncGroupedCert (void)
 			{
 				DMX_packet_flag = 0;
 
-				//en data tengo la info
-				Update_TIM3_CH1 (data[1]);
-				Update_TIM3_CH2 (data[2]);
-				Update_TIM3_CH3 (data[3]);
-				Update_TIM3_CH4 (data[4]);
+				//en data tengo la info, la guardo localmente
+				data_local[0] = data[1];
+				data_local[1] = data[2];
+				data_local[2] = data[3];
+				data_local[3] = data[4];
+
+				//Update_TIM3_CH1 (data[1]);
+				//Update_TIM3_CH2 (data[2]);
+				//Update_TIM3_CH3 (data[3]);
+				//Update_TIM3_CH4 (data[4]);
+				//Update_TIM1_CH1 (data[1]);
+				//Update_TIM1_CH2 (data[2]);
+				//Update_TIM1_CH3 (data[3]);
+				//Update_TIM1_CH4 (data[4]);
+
 				grouped_ii = data[2];
+			}
+
+
+			if (!filter_timer)
+			{
+				filter_timer = 5;
+
+				//filtro y muestro
+				data_local[0] = MAFilter32_u8(data_local[0], vd0);
+				data_local[1] = MAFilter32_u8(data_local[1], vd1);
+				data_local[2] = MAFilter32_u8(data_local[2], vd2);
+				data_local[3] = MAFilter32_u8(data_local[3], vd3);
+
+				Update_TIM3_CH1 (data_local[0]);
+				Update_TIM3_CH2 (data_local[1]);
+				Update_TIM3_CH3 (data_local[2]);
+				Update_TIM3_CH4 (data_local[3]);
+
+				Update_TIM1_CH1 (data_local[0]);
+				Update_TIM1_CH2 (data_local[1]);
+				Update_TIM1_CH3 (data_local[2]);
+				Update_TIM1_CH4 (data_local[3]);
 			}
 
 			if (grouped_slave_dim_last != grouped_ii)

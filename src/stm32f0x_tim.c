@@ -37,6 +37,26 @@ volatile unsigned short timer_1000 = 0;
 
 
 //--- FUNCIONES DEL MODULO ---//
+void Update_TIM1_CH1 (unsigned short a)
+{
+	TIM1->CCR1 = a;
+}
+
+void Update_TIM1_CH2 (unsigned short a)
+{
+	TIM1->CCR2 = a;
+}
+
+void Update_TIM1_CH3 (unsigned short a)
+{
+	TIM1->CCR3 = a;
+}
+
+void Update_TIM1_CH4 (unsigned short a)
+{
+	TIM1->CCR4 = a;
+}
+
 void Update_TIM3_CH1 (unsigned short a)
 {
 	TIM3->CCR1 = a;
@@ -96,6 +116,47 @@ void TIM3_IRQHandler (void)	//1 ms
 		TIM3->SR = 0x00;
 }
 
+void TIM_1_Init (void)
+{
+	unsigned int temp;
+
+	if (!RCC_TIM1_CLK)
+		RCC_TIM1_CLK_ON;
+
+	//Configuracion del timer.
+	TIM1->CR1 = 0x00;		//clk int / 1;
+	TIM1->CR2 |= TIM_CR2_MMS_1;		//UEV -> TRG0
+	//TIM1->CR2 = 0x00;
+	//TIM1->SMCR |= TIM_SMCR_MSM | TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_TS_1;	//link timer3
+
+	TIM1->SMCR = 0x0000;
+
+	TIM1->CCMR1 = 0x6060;			//CH2 CH1 output PWM mode 1
+	TIM1->CCMR2 = 0x6060;			//CH4 CH3 output PWM mode 1
+	TIM1->CCER |= TIM_CCER_CC1E | TIM_CCER_CC1P |  TIM_CCER_CC2E | TIM_CCER_CC2P | TIM_CCER_CC3E | TIM_CCER_CC3P |  TIM_CCER_CC4E | TIM_CCER_CC4P;
+	TIM1->BDTR |= TIM_BDTR_MOE;
+	TIM1->ARR = 255;				//cada tick 20.83ns
+
+	TIM1->CNT = 0;
+	TIM1->PSC = 11;
+
+	//Configuracion Pines
+	//Alternate Fuction
+	//temp = GPIOA->MODER;	//2 bits por pin
+	//temp &= 0xFFFCFFFF;		//PA8 (alternative)
+	//temp |= 0x00020000;
+	//GPIOA->MODER = temp;
+
+	temp = GPIOA->AFR[1];
+	temp |= 0x0002222;	//PA11 -> AF2; PA10 -> AF2; PA9 -> AF2; PA8 -> AF2
+	GPIOA->AFR[1] = temp;
+
+	// Enable timer ver UDIS
+	//TIM1->DIER |= TIM_DIER_UIE;
+	TIM1->CR1 |= TIM_CR1_CEN;
+
+	//TIM1->CCR1 = 0;
+}
 
 void TIM_3_Init (void)
 {
@@ -108,7 +169,9 @@ void TIM_3_Init (void)
 	//Configuracion del timer.
 	TIM3->CR1 = 0x00;		//clk int / 1; upcounting
 	TIM3->CR2 = 0x00;		//igual al reset
-//	TIM3->CCMR2 = 0x7070;			//CH4 y CH3 output PWM mode 2
+
+	TIM3->SMCR |= TIM_SMCR_SMS_2;	//reset mode link timer1
+
 	TIM3->CCMR1 = 0x6060;			//CH1 CH2 PWM mode 1
 	TIM3->CCMR2 = 0x6060;			//CH3 CH4 PWM mode 1
 	TIM3->CCER |= TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E;	//CH1 - CH4 enable on pin

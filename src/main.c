@@ -290,6 +290,7 @@ int main(void)
 	AdcConfig();
 
 	//TIM Configuration.
+	TIM_1_Init();
 	TIM_3_Init();
 	TIM_14_Init();
 	TIM_16_Init();		//para OneShoot() cuando funciona en modo master

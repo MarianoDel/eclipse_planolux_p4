@@ -54,6 +54,7 @@
 #define Timer_4_Init() TIM_17_Init()
 
 //--- Exported functions ---//
+void TIM_1_Init (void);
 void TIM3_IRQHandler (void);
 void TIM_3_Init(void);
 void TIM_6_Init (void);
@@ -67,6 +68,10 @@ void Update_TIM3_CH1 (unsigned short);
 void Update_TIM3_CH2 (unsigned short);
 void Update_TIM3_CH3 (unsigned short);
 void Update_TIM3_CH4 (unsigned short);
+void Update_TIM1_CH1 (unsigned short);
+void Update_TIM1_CH2 (unsigned short);
+void Update_TIM1_CH3 (unsigned short);
+void Update_TIM1_CH4 (unsigned short);
 
 void OneShootTIM16 (unsigned short);
 
