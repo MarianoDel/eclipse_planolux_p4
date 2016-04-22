@@ -66,6 +66,8 @@ unsigned char grouped_dimming_last_slope = 0;
 
 unsigned char grouped_menu_state = 0;
 
+unsigned char data_global [4];
+
 //-------------- Para Certificacion --------------//
 unsigned short grouped_last_temp = 0;
 unsigned short grouped_last_current = 0;
@@ -1061,8 +1063,9 @@ void MenuGroupedReset(void)
 unsigned char FuncGroupedCert (void)
 {
 	unsigned char resp = RESP_CONTINUE;
-	//unsigned char resp_down = RESP_CONTINUE;
 	unsigned char data_local [4];
+
+	//unsigned char resp_down = RESP_CONTINUE;
 
 	switch (grouped_state)
 	{
@@ -1100,10 +1103,10 @@ unsigned char FuncGroupedCert (void)
 				DMX_packet_flag = 0;
 
 				//en data tengo la info, la guardo localmente
-				data_local[0] = data[1];
-				data_local[1] = data[2];
-				data_local[2] = data[3];
-				data_local[3] = data[4];
+				data_global[0] = data[1];
+				data_global[1] = data[2];
+				data_global[2] = data[3];
+				data_global[3] = data[4];
 
 				//Update_TIM3_CH1 (data[1]);
 				//Update_TIM3_CH2 (data[2]);
@@ -1123,10 +1126,10 @@ unsigned char FuncGroupedCert (void)
 				filter_timer = 5;
 
 				//filtro y muestro
-				data_local[0] = MAFilter32_u8(data_local[0], vd0);
-				data_local[1] = MAFilter32_u8(data_local[1], vd1);
-				data_local[2] = MAFilter32_u8(data_local[2], vd2);
-				data_local[3] = MAFilter32_u8(data_local[3], vd3);
+				data_local[0] = MAFilter32_u8(data_global[0], vd0);
+				data_local[1] = MAFilter32_u8(data_global[1], vd1);
+				data_local[2] = MAFilter32_u8(data_global[2], vd2);
+				data_local[3] = MAFilter32_u8(data_global[3], vd3);
 
 				Update_TIM3_CH1 (data_local[0]);
 				Update_TIM3_CH2 (data_local[1]);
