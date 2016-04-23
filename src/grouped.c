@@ -1064,8 +1064,7 @@ unsigned char FuncGroupedCert (void)
 {
 	unsigned char resp = RESP_CONTINUE;
 	unsigned char data_local [4];
-
-	//unsigned char resp_down = RESP_CONTINUE;
+	unsigned char resp_down = RESP_CONTINUE;
 
 	switch (grouped_state)
 	{
@@ -1185,7 +1184,117 @@ unsigned char FuncGroupedCert (void)
 	}
 
 	//solo uso segundo renglon para el MenuStandAloneCert()
-	MenuGroupedCert();
+	//MenuGroupedCert();
+
+	//veo el menu solo si alguien toca los botones o timeout
+	switch (grouped_selections)
+	{
+		case MENU_ON:
+			//estado normal
+			resp_down = MenuGrouped();
+
+			if (resp_down == RESP_WORKING)	//alguien esta tratando de seleccionar algo, le doy tiempo
+				grouped_enable_menu_timer = TT_MENU_TIMEOUT;
+
+			if (resp_down == RESP_SELECTED)	//se selecciono algo
+			{
+				grouped_enable_menu_timer = TT_MENU_TIMEOUT;
+				grouped_selections++;
+			}
+
+			if (!grouped_enable_menu_timer)	//ya mostre el menu mucho tiempo, lo apago
+			{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *)s_blank_line);
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *)s_blank_line);
+				grouped_selections = MENU_OFF;
+			}
+
+			break;
+
+		case MENU_SELECTED:
+			//estado algo seleccionado espero update
+			resp_down = FuncShowBlink ((const char *) "Something Select", (const char *) "Updating Values", 1, BLINK_NO);
+
+			//if ((resp_down == RESP_FINISH) && (CheckS1() == S_NO))
+			if (resp_down == RESP_FINISH)
+			{
+				grouped_state = GROUPED_UPDATE;
+				grouped_selections = MENU_ON;
+			}
+			break;
+
+		case MENU_OFF:
+			//estado menu apagado
+			if ((CheckS1() > S_NO) || (CheckS2() > S_NO))
+			{
+				grouped_enable_menu_timer = TT_MENU_TIMEOUT;			//vuelvo a mostrar
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "wait to free    ");
+
+				grouped_selections++;
+			}
+			break;
+
+		case MENU_WAIT_FREE:
+			if ((CheckS1() == S_NO) && (CheckS2() == S_NO))
+			{
+				grouped_selections = MENU_ON;
+				//voy a activar el Menu
+				//me fijo en ue parte del Menu estaba
+				//TODO ES UNA CHANCHADA, PERO BUENO...
+				if (grouped_menu_state <= GROUPED_MENU_SLAVE_ENABLE)
+				{
+					//salgo directo
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "Cont.     Select");
+				}
+				else
+				{
+					if (grouped_menu_state <= GROUPED_MENU_MOV_SENS_SELECTED_2)
+					{
+						grouped_menu_state = GROUPED_MENU_MOV_SENS;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_LDR_SELECTED_5)
+					{
+						grouped_menu_state = GROUPED_MENU_LDR;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_MAX_DIMMING_SELECTED_1)
+					{
+						grouped_menu_state = GROUPED_MENU_MAX_DIMMING;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_MIN_DIMMING_SELECTED_1)
+					{
+						grouped_menu_state = GROUPED_MENU_MIN_DIMMING;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_RAMP_ON_START_SELECTED_1)
+					{
+						grouped_menu_state =GROUPED_MENU_RAMP_ON_START;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_RAMP_ON_DIMMING_SELECTED_1)
+					{
+						grouped_menu_state = GROUPED_MENU_RAMP_ON_DIMMING;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_MASTER_ENABLE_SELECTED_2)
+					{
+						grouped_menu_state = GROUPED_MENU_MASTER_ENABLE;
+					}
+					else if (grouped_menu_state <= GROUPED_MENU_SLAVE_ENABLE_SELECTED_3)
+					{
+						grouped_menu_state = GROUPED_MENU_SLAVE_ENABLE;
+					}
+					FuncOptionsReset ();
+					FuncShowSelectv2Reset ();
+					FuncChangeReset ();
+				}
+			}
+			break;
+
+		default:
+			grouped_selections = MENU_ON;
+			break;
+	}
 
 	if (CheckS1() > S_HALF)
 		resp = RESP_CHANGE_ALL_UP;
