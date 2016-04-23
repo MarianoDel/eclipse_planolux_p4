@@ -1063,8 +1063,11 @@ void MenuGroupedReset(void)
 unsigned char FuncGroupedCert (void)
 {
 	unsigned char resp = RESP_CONTINUE;
-	unsigned char data_local [4];
 	unsigned char resp_down = RESP_CONTINUE;
+
+	unsigned char data_local [4];
+	unsigned short color1, color2;
+
 
 	switch (grouped_state)
 	{
@@ -1122,23 +1125,31 @@ unsigned char FuncGroupedCert (void)
 
 			if (!filter_timer)
 			{
-				filter_timer = 5;
+				filter_timer = 2;
 
 				//filtro y muestro
-				data_local[0] = MAFilter32_u8(data_global[0], vd0);
-				data_local[1] = MAFilter32_u8(data_global[1], vd1);
+				//data_local[0] = MAFilter32_u8(data_global[0], vd0);
+				//data_local[1] = MAFilter32_u8(data_global[1], vd1);
 				data_local[2] = MAFilter32_u8(data_global[2], vd2);
 				data_local[3] = MAFilter32_u8(data_global[3], vd3);
 
-				Update_TIM3_CH1 (data_local[0]);
-				Update_TIM3_CH2 (data_local[1]);
-				Update_TIM3_CH3 (data_local[2]);
-				Update_TIM3_CH4 (data_local[3]);
+				color1 = 255 - data_local[3];
+				color2 = data_local[3];
 
-				Update_TIM1_CH1 (data_local[0]);
-				Update_TIM1_CH2 (data_local[1]);
-				Update_TIM1_CH3 (data_local[2]);
-				Update_TIM1_CH4 (data_local[3]);
+				//color1 = (((color1 + 1) * (data_local[2] + 1)) >> 8);
+				color1 = ((color1 * data_local[2]) >> 8);	//evita saltos del 100%
+				//color2 = (((color2 + 1) * (data_local[2] + 1)) >> 8);
+				color2 = ((color2 * data_local[2]) >> 8);	//evita saltos del 100%
+
+				//Update_TIM3_CH1 (data_local[0]);
+				//Update_TIM3_CH2 (data_local[1]);
+				Update_TIM3_CH3 (color1);
+				Update_TIM3_CH4 (color2);
+
+				//Update_TIM1_CH1 (data_local[0]);
+				//Update_TIM1_CH2 (data_local[1]);
+				Update_TIM1_CH3 (color1);
+				Update_TIM1_CH4 (color2);
 			}
 
 			if (grouped_slave_dim_last != grouped_ii)
